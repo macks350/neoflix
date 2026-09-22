@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Неофликс</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#16111f;--surface:#231b33;--surface2:#2c2240;--line:#3a2e52;--text:#f4eefc;--muted:#a99cc4;--accent:#ff5a3c;--ok:#5ad19a;--r:14px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-family:Unbounded,sans-serif;font-weight:800;font-size:20px;color:var(--accent);margin-right:auto}
+.badge{font-size:12px;border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:var(--muted)}
+.wallet{font-weight:700;background:var(--surface);border-radius:99px;padding:6px 12px;white-space:nowrap}
+.iconbtn{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}
+nav{display:flex;gap:6px;padding:12px 16px;overflow-x:auto}
+nav button{background:none;border:0;color:var(--muted);font:600 15px Manrope;padding:8px 14px;border-radius:99px;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--surface);color:var(--text)}
+main{padding:0 16px 32px;max-width:960px;margin:auto}
+h2{font-family:Unbounded,sans-serif;font-size:18px;margin:8px 0 14px}
+.search{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;margin-bottom:12px}
+.chips{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.chip{background:var(--surface);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:6px 12px;font:600 13px Manrope;cursor:pointer}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.film{border:0;padding:0;background:none;text-align:left;color:inherit;cursor:pointer;position:relative}
+.poster{aspect-ratio:2/3;border-radius:var(--r);display:flex;align-items:flex-end;padding:12px;font:800 15px Unbounded;line-height:1.2}
+.fav{position:absolute;top:8px;right:8px;background:#0007;border:0;color:#fff;border-radius:99px;width:30px;height:30px;font-size:15px}
+.film small{display:block;color:var(--muted);margin-top:6px}
+.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px}
+.plan.cur{border-color:var(--accent)}
+.plan b{font:800 17px Unbounded}
+.plan .price{font-size:22px;font-weight:700}
+.plan p{margin:0;color:var(--muted);font-size:14px}
+.btn{margin-top:auto;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px;font:700 15px Manrope;cursor:pointer}
+.btn:disabled{background:var(--line);color:var(--muted);cursor:default}
+.btn.ghost{background:var(--line)}
+.box{background:var(--surface);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.box input,.box select{background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px;font:inherit;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1;min-width:140px}
+.hist{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:8px 0;font-size:14px}
+.hist:first-child{border-top:0}
+.hist b.neg{color:#ff9b8a}.hist b.pos{color:var(--ok)}
+dialog{border:0;border-radius:var(--r);padding:0;background:var(--surface);width:min(94vw,420px);color:var(--text)}
+dialog::backdrop{background:#000c}
+#player{background:#000;width:min(94vw,860px)}
+#player .bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface)}
+#player .bar button{background:none;border:0;color:var(--text);font-size:22px;cursor:pointer}
+#player video{width:100%;display:block}
+.dlg-body{padding:18px}
+.dlg-body h3{font-family:Unbounded,sans-serif;margin:0 0 12px}
+.menu{position:fixed;top:0;right:0;height:100%;width:min(78vw,300px);background:var(--surface2);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s;z-index:20;padding:16px;padding-top:calc(16px + env(safe-area-inset-top))}
+.menu.open{transform:translateX(0)}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);font:600 16px Manrope;padding:12px 6px;border-bottom:1px solid var(--line);cursor:pointer}
+.menu .who{color:var(--muted);font-size:13px;margin-bottom:6px}
+#scrim{position:fixed;inset:0;background:#000a;opacity:0;pointer-events:none;transition:opacity .25s;z-index:19}
+#scrim.show{opacity:1;pointer-events:auto}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:99px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center;z-index:30}
+#toast.show{opacity:1}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:16px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Неофликс</div>
+  <span class="badge">Демо · виртуальные деньги</span>
+  <span class="wallet" id="wallet">…</span>
+  <button class="iconbtn" id="burger" aria-label="Меню">☰</button>
+</header>
+<nav id="nav">
+  <button data-t="films" class="on">Фильмы</button>
+  <button data-t="plans">Тарифы</button>
+  <button data-t="transfers">Переводы</button>
+  <button data-t="admin" id="adminTab" hidden>Админ</button>
+</nav>
+<main id="view"></main>
+<footer>Неофликс — учебный проект. В каталоге только легальные и общественно доступные видео.</footer>
+
+<div id="scrim"></div>
+<div class="menu" id="menu">
+  <div class="who" id="whoami">Вы не вошли</div>
+  <button data-m="login">Вход</button>
+  <button data-m="register">Регистрация</button>
+  <button data-m="logout" id="mLogout" hidden>Выйти</button>
+  <button data-m="adminLogin">Вход для админов</button>
+</div>
+
+<dialog id="authDlg"><div class="dlg-body">
+  <h3 id="authTitle">Вход</h3>
+  <div class="row"><input id="authUser" placeholder="Имя пользователя" autocomplete="off"></div>
+  <div class="row" style="margin-top:8px"><input id="authPass" type="password" placeholder="Пароль" autocomplete="off"></div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn ghost" id="authCancel" style="margin:0">Отмена</button>
+    <button class="btn" id="authOk" style="margin:0">Готово</button>
+  </div>
+</div></dialog>
+
+<dialog id="adminDlg"><div class="dlg-body">
+  <h3>Вход для админов</h3>
+  <div class="row"><input id="adminCode" type="password" placeholder="Код" autocomplete="off"></div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn ghost" id="adminCancel" style="margin:0">Отмена</button>
+    <button class="btn" id="adminOk" style="margin:0">Войти</button>
+  </div>
+</div></dialog>
+
+<dialog id="player">
+  <div class="bar"><span id="ptitle"></span><button id="pclose" aria-label="Закрыть">×</button></div>
+  <video id="video" controls playsinline></video>
+</dialog>
+<div id="toast"></div>
+
+<script>
+/* ====== НАСТРОЙКИ ====== */
+const ADMIN_CODE = 'admin123';          // смените код
+const WEEK_MS = 7 * 24 * 3600 * 1000;
+const START_BALANCE = 10000;            // стартовый баланс нового аккаунта
+
+// Добавляйте сюда только легальные видео (свободные лицензии, общественное достояние, свои файлы).
+const FILMS = [
+  {t:'Big Buck Bunny', y:2008, cat:'Полнометражные', src:'https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4'},
+  {t:'Sintel', y:2010, cat:'Полнометражные', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'},
+  {t:'Elephants Dream', y:2006, cat:'Полнометражные', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'},
+  {t:'Tears of Steel', y:2012, cat:'Полнометражные', src:'https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov'},
+  {t:'Sintel (трейлер)', y:2010, cat:'Короткометражки', src:'https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4'},
+  {t:'For Bigger Blazes', y:2014, cat:'Короткометражки', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'},
+  {t:'For Bigger Escapes', y:2014, cat:'Короткометражки', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'},
+  {t:'For Bigger Fun', y:2014, cat:'Короткометражки', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'},
+  {t:'For Bigger Joyrides', y:2014, cat:'Короткометражки', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'},
+  {t:'For Bigger Meltdowns', y:2014, cat:'Короткометражки', src:'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'},
+];
+
+const PLANS = [
+  {id:'free',     name:'Обч',        films:5,    price:0},
+  {id:'pro',      name:'Про',        films:50,   price:1000},
+  {id:'proplus',  name:'Про+',       films:500,  price:1500},
+  {id:'max',      name:'Про Макс',   films:650,  price:5000},
+  {id:'maxplus',  name:'Про Макс+',  films:750,  price:10000},
+  {id:'ultra',    name:'Ультра',     films:1000, price:65000},
+  {id:'ultraplus',name:'Ультра+',    films:4500, price:10000},
+];
+const ADMIN_PLAN = {id:'admin', name:'Админ', films:Infinity, price:0};
+
+/* ====== МОСТ С БАНКОМ (общий кошелёк сайта) ====== */
+const WKEY = 'demoWallet';
+const getBank = () => { try{const w=JSON.parse(localStorage.getItem(WKEY)); if(w&&typeof w.balance==='number') return w;}catch(e){} return {balance:125430, ops:[]}; };
+const setBank = w => localStorage.setItem(WKEY, JSON.stringify(w));
+function bankPay(amount, title){
+  const w = getBank();
+  if (w.balance < amount) return false;
+  w.balance -= amount;
+  w.ops = [{title, amount:-amount, ts:Date.now()}, ...(w.ops||[])].slice(0,50);
+  setBank(w); return true;
+}
+function bankAdd(amount, title){ const w=getBank(); w.balance+=amount; w.ops=[{title,amount,ts:Date.now()},...(w.ops||[])].slice(0,50); setBank(w); }
+
+/* ====== АККАУНТЫ НЕОФЛИКСА ====== */
+const UKEY='neoflixUsers', SESSKEY='neoflixSession';
+function loadUsers(){ try{return JSON.parse(localStorage.getItem(UKEY))||{};}catch(e){return {};} }
+function saveUsers(u){ localStorage.setItem(UKEY, JSON.stringify(u)); }
+function newAccount(){ return {pass:'', balance:START_BALANCE, plan:'free', next:Date.now()+WEEK_MS, week:WEEK_MS, watched:[], favs:[], history:[]}; }
+
+let USERS = loadUsers();
+let session = localStorage.getItem(SESSKEY);
+
+// Первый запуск: переносим старое анонимное состояние (если было) в аккаунт «Гость»
+(function migrate(){
+  if (Object.keys(USERS).length) return;
+  let old=null; try{old=JSON.parse(localStorage.getItem('neoflixState'));}catch(e){}
+  const acc = newAccount();
+  if (old){ acc.plan=old.plan||'free'; acc.watched=old.watched||[]; acc.next=old.next||acc.next; }
+  acc.balance = getBank().balance>=START_BALANCE ? START_BALANCE : getBank().balance;
+  USERS = {'Гость': acc}; saveUsers(USERS);
+  session = 'Гость'; localStorage.setItem(SESSKEY, session);
+})();
+
+function me(){ return session ? USERS[session] : null; }
+function saveMe(){ if(session){ USERS[session]=U; saveUsers(USERS); } }
+let U = me() || newAccount();
+let isAdminUser = false;
+
+const planOf = id => id==='admin' ? ADMIN_PLAN : PLANS.find(p=>p.id===id);
+const fmt = n => Number(n).toLocaleString('ru-RU');
+const $ = s => document.querySelector(s);
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* Еженедельное списание подписки */
+function billing(){
+  if(!session) return;
+  let changed=false;
+  while (Date.now() >= U.next){
+    const p = isAdminUser ? ADMIN_PLAN : planOf(U.plan);
+    if (p.price>0){
+      if (U.balance>=p.price){ U.balance-=p.price; U.history=[{title:'Тариф «'+p.name+'»', amount:-p.price, ts:Date.now()},...(U.history||[])].slice(0,50); }
+      else { U.plan='free'; toast('Не хватило средств — включён тариф Обч'); }
+    }
+    U.watched=[]; U.next += U.week; changed=true;
+  }
+  if(changed) saveMe();
+}
+
+/* ====== ЭКРАНЫ ====== */
+let tab='films', catFilter='all', showFavOnly=false, query='';
+function render(){
+  billing();
+  $('#wallet').textContent = session ? fmt(U.balance)+' ₽' : fmt(getBank().balance)+' ₽';
+  $('#adminTab').hidden = !isAdminUser;
+  $('#whoami').textContent = session ? ('Вы вошли: '+session+(isAdminUser?' · админ':'')) : 'Вы не вошли';
+  $('#mLogout').hidden = !session;
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===tab));
+  const v=$('#view');
+  if(tab==='films') v.innerHTML = filmsView();
+  else if(tab==='plans') v.innerHTML = plansView();
+  else if(tab==='transfers') v.innerHTML = transfersView();
+  else if(tab==='admin' && isAdminUser) v.innerHTML = adminView();
+}
+
+function filmsView(){
+  if(!session) return `<h2>Фильмы</h2><div class="box">Войдите или зарегистрируйтесь (кнопка ☰), чтобы смотреть фильмы и оформить подписку.</div>`;
+  const p = isAdminUser ? ADMIN_PLAN : planOf(U.plan), left = p.films===Infinity ? '∞' : Math.max(0,p.films-U.watched.length);
+  const days = Math.max(0, Math.ceil((U.next-Date.now())/(U.week/7)));
+  const cats = ['all', ...new Set(FILMS.map(f=>f.cat))];
+  let list = FILMS.filter(f => (catFilter==='all'||f.cat===catFilter) && f.t.toLowerCase().includes(query.toLowerCase()));
+  if(showFavOnly) list = list.filter(f=>U.favs.includes(f.t));
+  return `<h2>Фильмы</h2>
+  <div class="box">Тариф «${p.name}» · осталось на неделю: <b>${left}</b>${p.price?` · списание через ${days} дн.`:''}</div>
+  <input class="search" id="q" placeholder="Поиск по названию…" value="${query}">
+  <div class="chips">
+    ${cats.map(c=>`<button class="chip ${catFilter===c?'on':''}" data-cat="${c}">${c==='all'?'Все':c}</button>`).join('')}
+    <button class="chip ${showFavOnly?'on':''}" id="favChip">★ Избранное</button>
+  </div>
+  <div class="grid">${list.map(f=>{const i=FILMS.indexOf(f); const fav=U.favs.includes(f.t);
+    return `<button class="film" data-i="${i}">
+      <span class="fav" data-fav="${f.t}">${fav?'★':'☆'}</span>
+      <div class="poster" style="background:linear-gradient(160deg,hsl(${(i*57+10)%360} 70% 45%),hsl(${(i*57+60)%360} 60% 18%))">${f.t}</div>
+      <small>${f.y} · ${f.cat}${U.watched.includes(i)?' · открыт':''}</small>
+    </button>`;}).join('') || '<p style="color:var(--muted)">Ничего не найдено.</p>'}</div>`;
+}
+
+function plansView(){
+  const curPlan = isAdminUser ? 'admin' : U.plan;
+  return `<h2>Тарифы</h2><div class="plans">${PLANS.map(p=>`
+    <div class="plan ${p.id===curPlan?'cur':''}">
+      <b>${p.name}</b>
+      <div class="price">${p.price?fmt(p.price)+' ₽ / неделя':'Бесплатно'}</div>
+      <p>${fmt(p.films)} фильмов в неделю</p>
+      <button class="btn" data-plan="${p.id}" ${p.id===curPlan||!session?'disabled':''}>${p.id===curPlan?'Ваш тариф':(session?'Подключить':'Войдите')}</button>
+    </div>`).join('')}</div>`;
+}
+
+function transfersView(){
+  if(!session) return `<h2>Переводы</h2><div class="box">Войдите, чтобы переводить деньги другим пользователям Неофликса.</div>`;
+  const others = Object.keys(USERS).filter(n=>n!==session);
+  const hist = (U.history||[]).slice(0,12);
+  return `<h2>Переводы</h2>
+  <div class="box">
+    <div class="row">
+      <select id="toUser">${others.length?others.map(n=>`<option>${n}</option>`).join(''):'<option disabled>Нет других пользователей</option>'}</select>
+      <input id="amt" type="number" min="1" placeholder="Сумма ₽">
+    </div>
+    <button class="btn" id="sendBtn" style="margin-top:10px">Перевести</button>
+  </div>
+  <div class="box">
+    <div class="row"><input id="topupAmt" type="number" min="1" placeholder="Сумма ₽"></div>
+    <button class="btn ghost" id="fromBank" style="margin-top:10px">Пополнить из банка (общий счёт)</button>
+  </div>
+  <div class="box"><h2 style="margin-top:0">История</h2>
+    ${hist.length?hist.map(h=>`<div class="hist"><span>${h.title}</span><b class="${h.amount<0?'neg':'pos'}">${h.amount<0?'−':'+'}${fmt(Math.abs(h.amount))} ₽</b></div>`).join(''):'<p style="color:var(--muted);margin:0">Пока пусто.</p>'}
+  </div>`;
+}
+
+function adminView(){
+  return `<h2>Админ</h2>
+  <div class="box row"><input id="sum" type="number" value="10000">
+    <button class="btn" id="topup" style="margin:0">Пополнить общий счёт банка</button></div>
+  <div class="box"><label class="row" style="align-items:center"><input type="checkbox" id="fast" ${U.week<WEEK_MS?'checked':''} style="flex:0 0 auto;width:auto"> Тест: «неделя» = 1 минута</label></div>
+  <div class="box">Пользователей Неофликса: ${Object.keys(USERS).length}</div>`;
+}
+
+/* ====== СОБЫТИЯ: навигация и меню ====== */
+$('#burger').onclick = ()=>{ $('#menu').classList.add('open'); $('#scrim').classList.add('show'); };
+$('#scrim').onclick = closeMenu;
+function closeMenu(){ $('#menu').classList.remove('open'); $('#scrim').classList.remove('show'); }
+
+document.addEventListener('click', e=>{
+  const nb=e.target.closest('#nav button'); if(nb){tab=nb.dataset.t; render(); return;}
+  const catBtn=e.target.closest('[data-cat]'); if(catBtn){catFilter=catBtn.dataset.cat; render(); return;}
+  if(e.target.id==='favChip'){ showFavOnly=!showFavOnly; render(); return; }
+  const favBtn=e.target.closest('[data-fav]'); if(favBtn){ toggleFav(favBtn.dataset.fav); return; }
+  const fb=e.target.closest('.film'); if(fb){ openFilm(+fb.dataset.i); return; }
+  const pb=e.target.closest('[data-plan]'); if(pb){ subscribe(pb.dataset.plan); return; }
+  const mb=e.target.closest('.menu button'); if(mb){ handleMenu(mb.dataset.m); return; }
+  if(e.target.id==='sendBtn') doTransfer();
+  if(e.target.id==='fromBank') topupFromBank();
+  if(e.target.id==='topup'){ const n=+$('#sum').value; if(n>0){ bankAdd(n,'Пополнение (админ)'); render(); toast('Общий счёт пополнен'); } }
+  if(e.target.id==='fast'){ U.week = e.target.checked ? 60000 : WEEK_MS; U.next = Date.now()+U.week; saveMe(); }
+});
+document.addEventListener('input', e=>{ if(e.target.id==='q'){ query=e.target.value; render(); } });
+
+function toggleFav(title){
+  const i=U.favs.indexOf(title);
+  if(i>=0) U.favs.splice(i,1); else U.favs.push(title);
+  saveMe(); render();
+}
+
+function subscribe(id){
+  const p=planOf(id);
+  if(p.price>U.balance){ toast('Недостаточно средств'); return; }
+  if(p.price){ U.balance-=p.price; U.history=[{title:'Тариф «'+p.name+'»',amount:-p.price,ts:Date.now()},...(U.history||[])]; }
+  U.plan=id; U.next=Date.now()+U.week; U.watched=[]; saveMe(); render();
+  toast('Тариф «'+p.name+'» подключён');
+}
+
+function openFilm(i){
+  if(!session) return;
+  const p=isAdminUser?ADMIN_PLAN:planOf(U.plan);
+  if(!U.watched.includes(i)){
+    if(U.watched.length>=p.films){ toast('Лимит недели исчерпан — смените тариф'); return; }
+    U.watched.push(i); saveMe();
+  }
+  $('#ptitle').textContent=FILMS[i].t;
+  const v=$('#video'); v.src=FILMS[i].src; $('#player').showModal(); v.play().catch(()=>{});
+  render();
+}
+$('#pclose').onclick = ()=>$('#player').close();
+$('#player').addEventListener('close', ()=>{ const v=$('#video'); v.pause(); v.removeAttribute('src'); v.load(); });
+
+function doTransfer(){
+  const to=$('#toUser').value, amt=+$('#amt').value;
+  if(!to || !USERS[to]){ toast('Выберите получателя'); return; }
+  if(!amt || amt<=0){ toast('Введите сумму'); return; }
+  if(amt>U.balance){ toast('Недостаточно средств'); return; }
+  U.balance-=amt; U.history=[{title:'Перевод → '+to, amount:-amt, ts:Date.now()},...(U.history||[])];
+  USERS[to].balance+=amt; USERS[to].history=[{title:'Перевод от '+session, amount:amt, ts:Date.now()},...(USERS[to].history||[])];
+  saveUsers(USERS); saveMe(); render(); toast('Переведено '+fmt(amt)+' ₽');
+}
+function topupFromBank(){
+  const amt=+$('#topupAmt').value;
+  if(!amt||amt<=0){ toast('Введите сумму'); return; }
+  if(!bankPay(amt,'Неофликс: пополнение счёта')){ toast('Недостаточно средств в банке'); return; }
+  U.balance+=amt; U.history=[{title:'Пополнение из банка', amount:amt, ts:Date.now()},...(U.history||[])];
+  saveMe(); render(); toast('Счёт Неофликса пополнен');
+}
+
+/* ====== АВТОРИЗАЦИЯ ====== */
+let authMode='login';
+function handleMenu(m){
+  closeMenu();
+  if(m==='login'||m==='register'){ authMode=m; $('#authTitle').textContent = m==='login'?'Вход':'Регистрация'; $('#authUser').value=''; $('#authPass').value=''; $('#authDlg').showModal(); }
+  else if(m==='logout'){ session=null; localStorage.removeItem(SESSKEY); isAdminUser=false; U=newAccount(); tab='films'; render(); }
+  else if(m==='adminLogin'){ $('#adminCode').value=''; $('#adminDlg').showModal(); }
+}
+$('#authCancel').onclick = ()=>$('#authDlg').close();
+$('#authOk').onclick = ()=>{
+  const name=$('#authUser').value.trim(), pass=$('#authPass').value;
+  if(!name||!pass){ toast('Заполните оба поля'); return; }
+  if(authMode==='register'){
+    if(USERS[name]){ toast('Такое имя уже занято'); return; }
+    const acc=newAccount(); acc.pass=pass; USERS[name]=acc; saveUsers(USERS);
+    session=name; localStorage.setItem(SESSKEY,session); U=acc; isAdminUser=false;
+    toast('Аккаунт создан, добро пожаловать!');
+  } else {
+    const acc=USERS[name];
+    if(!acc || acc.pass!==pass){ toast('Неверное имя или пароль'); return; }
+    session=name; localStorage.setItem(SESSKEY,session); U=acc; isAdminUser=false;
+    toast('Вы вошли как '+name);
+  }
+  $('#authDlg').close(); tab='films'; render();
+};
+$('#adminCancel').onclick = ()=>$('#adminDlg').close();
+$('#adminOk').onclick = ()=>{
+  if($('#adminCode').value===ADMIN_CODE){ isAdminUser=true; $('#adminDlg').close(); tab='admin'; render(); toast('Режим админа включён'); }
+  else toast('Неверный код');
+};
+
+/* Живая синхронизация между вкладками */
+window.addEventListener('storage', e=>{ if(e.key===UKEY||e.key===WKEY){ USERS=loadUsers(); if(session) U=USERS[session]||U; render(); }});
+setInterval(render, 30000);
+render();
+</script>
+</body>
+</html>
